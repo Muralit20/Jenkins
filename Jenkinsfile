@@ -1,16 +1,12 @@
 pipeline {
 environment {
-    TF_WORKSPACE = 'dev' //Sets the Terraform Workspace
-    TF_IN_AUTOMATION = 'true'
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'awsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
-  }
-stages {
-    stage('checkout') {
-    node {
-      cleanWs()
-      checkout scm
+    {
+        TF_WORKSPACE = 'dev' //Sets the Terraform Workspace
+    TF_IN_AUTOMATION = 'true'
     }
-  }
+}
+stages {
     stage('Terraform Init') {
       steps {
         sh "${env.TERRAFORM_HOME}/terraform init -input=false"
