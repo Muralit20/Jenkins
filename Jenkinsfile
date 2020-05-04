@@ -1,18 +1,18 @@
+pipeline {
 String credentialsId = 'awsCredentials'
-
-try {
-  stage('checkout') {
-    node {
-      cleanWs()
-      checkout scm
-    }
-  }
 environment {
     TF_WORKSPACE = 'dev' //Sets the Terraform Workspace
     TF_IN_AUTOMATION = 'true'
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'awsCredentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
   }
 stages {
+  try{
+    stage('checkout') {
+    node {
+      cleanWs()
+      checkout scm
+    }
+  }
     stage('Terraform Init') {
       steps {
         sh "${env.TERRAFORM_HOME}/terraform init -input=false"
@@ -34,6 +34,7 @@ stages {
 }
   currentBuild.result = 'SUCCESS'
 }
+}
 catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException flowError) {
   currentBuild.result = 'ABORTED'
 }
@@ -45,4 +46,5 @@ finally {
   if (currentBuild.result == 'SUCCESS') {
     currentBuild.result = 'SUCCESS'
   }
+}
 }
